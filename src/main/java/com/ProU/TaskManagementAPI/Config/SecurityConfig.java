@@ -22,7 +22,27 @@ public class SecurityConfig {
 
 	@Bean
 	public PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
+		// Accept existing plaintext passwords (development convenience) or BCrypt hashes.
+		// If the stored password looks like a BCrypt hash (starts with $2), use BCrypt matching,
+		// otherwise fall back to plain-text equality. This is a dev-only convenience.
+		var bcrypt = new BCryptPasswordEncoder();
+		return new PasswordEncoder() {
+			@Override
+			public String encode(CharSequence rawPassword) {
+				return bcrypt.encode(rawPassword);
+			}
+
+			@Override
+			public boolean matches(CharSequence rawPassword, String encodedPassword) {
+				if (encodedPassword == null) return false;
+				String ep = encodedPassword;
+				if (ep.startsWith("$2a$") || ep.startsWith("$2b$") || ep.startsWith("$2y$")) {
+					return bcrypt.matches(rawPassword, ep);
+				}
+				// fallback: plain-text comparison
+				return ep.equals(rawPassword.toString());
+			}
+		};
 	}
 
 	@Bean
@@ -47,6 +67,8 @@ public class SecurityConfig {
 			.csrf(csrf -> csrf.disable())
 			.authorizeHttpRequests(auth -> auth
 				.requestMatchers("/auth/**").permitAll()
+				.requestMatchers("/signup").permitAll()
+				.requestMatchers("/login", "/login/admin").permitAll()
 				// employee endpoints: listing and viewing allowed for authenticated users
 				.requestMatchers(HttpMethod.GET, "/employees", "/tasks", "/tasks/*", "/tasks/dashboard").hasAnyRole("ADMIN","EMPLOYEE")
 				// only ADMIN can create employees and tasks or delete tasks
@@ -54,6 +76,7 @@ public class SecurityConfig {
 				.requestMatchers(HttpMethod.POST, "/tasks").hasRole("ADMIN")
 				.requestMatchers(HttpMethod.DELETE, "/tasks/*").hasRole("ADMIN")
 				// updates allowed for admin or employee
+				.requestMatchers("/admin/**").hasRole("ADMIN")
 				.requestMatchers(HttpMethod.PUT, "/tasks/*").hasAnyRole("ADMIN","EMPLOYEE")
 				.anyRequest().authenticated()
 			)
