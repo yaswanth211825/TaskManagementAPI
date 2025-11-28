@@ -1,16 +1,5 @@
 # TaskManagementAPI
 
-An easy-to-run REST backend for managing Employees and Tasks. This README explains how to set up the project locally, run it, and test all implemented APIs (employee and admin flows).
-
-**Contents**
-- **Setup**: prerequisites and how to run locally
-- **Tech stack**: core libraries and versions
-- **Quick start**: build & run commands
-- **Database setup & migrations**
-- **APIs**: overview + curl/Postman examples
-- **Screenshots / recording**: where to add them
-- **Assumptions & bonus features**
-- **Git cleanup**: remove unwanted tracked files and push a clean commit
 
 **Setup (local)**
 - Prerequisites:
@@ -62,7 +51,6 @@ The app starts on port `9090` by default. Flyway will run migrations on startup.
 - `DELETE /tasks/{id}` — delete task (ADMIN only)
 - `GET /tasks/dashboard` — grouped tasks view (ADMIN/EMPLOYEE)
 
-See the `src/main/java/com/ProU/TaskManagementAPI/Controllers` folder for controller details and DTOs for exact request shapes.
 
 **Request payload notes**
 - `CreateTaskRequest` expects JSON fields:
@@ -94,12 +82,6 @@ curl -i -X POST -H "Content-Type: application/json" \
 ```bash
 curl -i -u "nanda@prou:nanda" http://localhost:9090/tasks
 ```
-
-**Screenshots / Short screen recording**
-- Add images or a short recording under `docs/images/` or `docs/video/` and reference them here. Example:
-  - `docs/images/tasks-list.png`
-  - `docs/video/demo.mp4`
-- Git will not track large video files well; prefer compressed GIF or a short MP4 (<10-20MB) or upload to a shared drive and link.
 
 **Assumptions & Bonus features implemented**
 - Assumptions:
